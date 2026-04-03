@@ -1,0 +1,104 @@
+{
+  "last_updated": "2026-04-03 08:56 UTC",
+  "source_file": "sample_incidents.csv",
+  "status": "processed",
+  "total_incidents": 60,
+  "invalid_records": 0,
+  "pct_resolved": 38.3,
+  "by_category": {
+    "Noise Complaint": 7,
+    "Graffiti": 18,
+    "Dumped Rubbish": 10,
+    "Streetlight Fault": 10,
+    "Tree Down": 5,
+    "Pothole": 9,
+    "Water Leak": 1
+  },
+  "by_status": {
+    "Resolved": 23,
+    "Open": 22,
+    "In Progress": 15
+  },
+  "recent_incidents": [
+    {
+      "incident_id": "INC0008",
+      "reported_date": "2026-03-26",
+      "suburb": "Fitzroy",
+      "category": "Graffiti",
+      "status": "Resolved",
+      "priority": "Low"
+    },
+    {
+      "incident_id": "INC0054",
+      "reported_date": "2026-03-26",
+      "suburb": "Fitzroy",
+      "category": "Water Leak",
+      "status": "In Progress",
+      "priority": "Low"
+    },
+    {
+      "incident_id": "INC0020",
+      "reported_date": "2026-03-25",
+      "suburb": "Carlton",
+      "category": "Noise Complaint",
+      "status": "Resolved",
+      "priority": "Medium"
+    },
+    {
+      "incident_id": "INC0034",
+      "reported_date": "2026-03-25",
+      "suburb": "Frankston",
+      "category": "Graffiti",
+      "status": "In Progress",
+      "priority": "Low"
+    },
+    {
+      "incident_id": "INC0009",
+      "reported_date": "2026-03-24",
+      "suburb": "Coburg",
+      "category": "Dumped Rubbish",
+      "status": "Resolved",
+      "priority": "Low"
+    },
+    {
+      "incident_id": "INC0025",
+      "reported_date": "2026-03-24",
+      "suburb": "Preston",
+      "category": "Streetlight Fault",
+      "status": "Open",
+      "priority": "Medium"
+    },
+    {
+      "incident_id": "INC0030",
+      "reported_date": "2026-03-24",
+      "suburb": "Fitzroy",
+      "category": "Graffiti",
+      "status": "Open",
+      "priority": "Low"
+    },
+    {
+      "incident_id": "INC0035",
+      "reported_date": "2026-03-24",
+      "suburb": "Box Hill",
+      "category": "Streetlight Fault",
+      "status": "Resolved",
+      "priority": "High"
+    },
+    {
+      "incident_id": "INC0038",
+      "reported_date": "2026-03-24",
+      "suburb": "Carlton",
+      "category": "Pothole",
+      "status": "Resolved",
+      "priority": "High"
+    },
+    {
+      "incident_id": "INC0043",
+      "reported_date": "2026-03-24",
+      "suburb": "Coburg",
+      "category": "Graffiti",
+      "status": "Open",
+      "priority": "Medium"
+    }
+  ]
+}
