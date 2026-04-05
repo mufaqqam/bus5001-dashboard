@@ -1,0 +1,36 @@
+{
+  "last_updated": "2026-04-05T23:55:00Z",
+  "source_file": "sample_incidents.csv",
+  "status": "processed",
+  "total_incidents": 60,
+  "open_incidents": 20,
+  "resolved_incidents": 28,
+  "in_progress_incidents": 12,
+  "resolution_rate": "46.7%",
+  "by_category": {
+    "Graffiti": 18,
+    "Dumped Rubbish": 10,
+    "Streetlight Fault": 10,
+    "Noise Complaint": 8,
+    "Pothole": 8,
+    "Tree Down": 5,
+    "Water Leak": 1
+  },
+  "by_priority": {
+    "High": 10,
+    "Medium": 22,
+    "Low": 28
+  },
+  "recent_incidents": [
+    {"incident_id": "INC0060", "reported_date": "2026-03-04", "suburb": "Hawthorn", "category": "Noise Complaint", "status": "Open", "priority": "Low"},
+    {"incident_id": "INC0059", "reported_date": "2026-03-18", "suburb": "Footscray", "category": "Streetlight Fault", "status": "In Progress", "priority": "Medium"},
+    {"incident_id": "INC0058", "reported_date": "2026-03-03", "suburb": "Sunshine", "category": "Dumped Rubbish", "status": "Open", "priority": "Low"},
+    {"incident_id": "INC0057", "reported_date": "2026-03-23", "suburb": "Footscray", "category": "Graffiti", "status": "In Progress", "priority": "Low"},
+    {"incident_id": "INC0056", "reported_date": "2026-03-05", "suburb": "St Kilda", "category": "Dumped Rubbish", "status": "Resolved", "priority": "Medium"},
+    {"incident_id": "INC0055", "reported_date": "2026-03-09", "suburb": "Frankston", "category": "Pothole", "status": "In Progress", "priority": "Medium"},
+    {"incident_id": "INC0054", "reported_date": "2026-03-26", "suburb": "Fitzroy", "category": "Water Leak", "status": "In Progress", "priority": "Low"},
+    {"incident_id": "INC0053", "reported_date": "2026-03-15", "suburb": "Fitzroy", "category": "Pothole", "status": "Resolved", "priority": "Medium"},
+    {"incident_id": "INC0052", "reported_date": "2026-03-11", "suburb": "St Kilda", "category": "Streetlight Fault", "status": "Resolved", "priority": "Low"},
+    {"incident_id": "INC0051", "reported_date": "2026-03-16", "suburb": "Box Hill", "category": "Graffiti", "status": "Resolved", "priority": "Low"}
+  ]
+}
