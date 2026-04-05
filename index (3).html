@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Council Incident Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f2f5;
+      color: #1a1a2e;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #00467F, #1a6eb5);
+      color: white;
+      padding: 24px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header p  { font-size: 0.85rem; opacity: 0.85; margin-top: 4px; }
+    #last-updated {
+      font-size: 0.8rem;
+      background: rgba(255,255,255,0.15);
+      padding: 6px 14px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    /* ── Main layout ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 30px 24px; }
+
+    /* ── KPI Cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: white;
+      border-radius: 10px;
+      padding: 22px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      border-left: 5px solid #00467F;
+    }
+    .kpi-card.open   { border-left-color: #e74c3c; }
+    .kpi-card.prog   { border-left-color: #f39c12; }
+    .kpi-card.res    { border-left-color: #27ae60; }
+    .kpi-card.rate   { border-left-color: #8e44ad; }
+    .kpi-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.8px; color: #666; margin-bottom: 8px; font-weight: 700; }
+    .kpi-value { font-size: 2rem; font-weight: 700; color: #00467F; }
+    .kpi-card.open .kpi-value { color: #e74c3c; }
+    .kpi-card.prog .kpi-value { color: #f39c12; }
+    .kpi-card.res  .kpi-value { color: #27ae60; }
+    .kpi-card.rate .kpi-value { color: #8e44ad; }
+
+    /* ── Charts + Priority row ── */
+    .charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 22px 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .card h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #00467F;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+    .chart-wrap { position: relative; height: 240px; }
+
+    /* ── Priority bars ── */
+    .priority-list { display: flex; flex-direction: column; gap: 14px; }
+    .priority-item {}
+    .priority-header { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; }
+    .priority-bar-bg { background: #f0f2f5; border-radius: 6px; height: 10px; }
+    .priority-bar    { height: 10px; border-radius: 6px; transition: width 0.6s ease; }
+    .bar-high   { background: #e74c3c; }
+    .bar-medium { background: #f39c12; }
+    .bar-low    { background: #27ae60; }
+
+    /* ── Table ── */
+    .table-card { background: white; border-radius: 10px; padding: 22px 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .table-card h2 {
+      font-size: 0.95rem; font-weight: 700; color: #00467F;
+      margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid #f0f2f5;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+    th {
+      background: #00467F; color: white;
+      padding: 10px 14px; text-align: left;
+      font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    th:first-child { border-radius: 6px 0 0 0; }
+    th:last-child  { border-radius: 0 6px 0 0; }
+    td { padding: 10px 14px; border-bottom: 1px solid #f0f2f5; }
+    tr:hover td { background: #f7f9fc; }
+    tr:last-child td { border-bottom: none; }
+
+    /* Status badges */
+    .badge {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 12px; font-size: 0.75rem; font-weight: 600;
+    }
+    .badge-open     { background: #fdecea; color: #c0392b; }
+    .badge-resolved { background: #eafaf1; color: #1e8449; }
+    .badge-progress { background: #fef9e7; color: #b7770d; }
+
+    /* Priority badges */
+    .pri { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 0.72rem; font-weight: 600; }
+    .pri-high   { background: #fdecea; color: #c0392b; }
+    .pri-medium { background: #fef9e7; color: #b7770d; }
+    .pri-low    { background: #eafaf1; color: #1e8449; }
+
+    /* ── Loading / error ── */
+    #loading {
+      text-align: center; padding: 60px;
+      color: #666; font-size: 1rem;
+    }
+    #error-msg {
+      display: none;
+      background: #fdecea; color: #c0392b;
+      padding: 16px 24px; border-radius: 8px;
+      margin-bottom: 20px; font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+      .charts-row { grid-template-columns: 1fr; }
+      header { flex-direction: column; gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🏛️ Council Community Incident Dashboard</h1>
+    <p>Automated incident data — updated daily by Azure Logic App</p>
+  </div>
+  <div id="last-updated">Loading...</div>
+</header>
+
+<main>
+  <div id="error-msg"></div>
+  <div id="loading">⏳ Loading incident data...</div>
+
+  <div id="dashboard" style="display:none">
+
+    <!-- KPI Cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Incidents</div>
+        <div class="kpi-value" id="kpi-total">—</div>
+      </div>
+      <div class="kpi-card open">
+        <div class="kpi-label">Open Incidents</div>
+        <div class="kpi-value" id="kpi-open">—</div>
+      </div>
+      <div class="kpi-card prog">
+        <div class="kpi-label">In Progress</div>
+        <div class="kpi-value" id="kpi-prog">—</div>
+      </div>
+      <div class="kpi-card res">
+        <div class="kpi-label">Resolved</div>
+        <div class="kpi-value" id="kpi-resolved">—</div>
+      </div>
+      <div class="kpi-card rate">
+        <div class="kpi-label">Resolution Rate</div>
+        <div class="kpi-value" id="kpi-rate">—</div>
+      </div>
+    </div>
+
+    <!-- Charts row -->
+    <div class="charts-row">
+      <div class="card">
+        <h2>📊 Incidents by Category</h2>
+        <div class="chart-wrap">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h2>🎯 Incidents by Priority</h2>
+        <div class="priority-list" id="priority-list"></div>
+      </div>
+    </div>
+
+    <!-- Recent Incidents Table -->
+    <div class="table-card">
+      <h2>🕒 Recent Incidents</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Incident ID</th>
+            <th>Date</th>
+            <th>Suburb</th>
+            <th>Category</th>
+            <th>Status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody id="incidents-table"></tbody>
+      </table>
+    </div>
+
+  </div><!-- /dashboard -->
+</main>
+
+<script>
+  const SUMMARY_URL = 'https://sacouncilincidents01.blob.core.windows.net/public-data/summary.json';
+
+  async function loadData() {
+    try {
+      const res = await fetch(SUMMARY_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      renderDashboard(data);
+    } catch (err) {
+      document.getElementById('loading').style.display = 'none';
+      const errEl = document.getElementById('error-msg');
+      errEl.style.display = 'block';
+      errEl.textContent = `Unable to load incident data: ${err.message}. Please ensure CORS is enabled on the storage account.`;
+    }
+  }
+
+  function badgeStatus(status) {
+    if (status === 'Open')        return `<span class="badge badge-open">Open</span>`;
+    if (status === 'Resolved')    return `<span class="badge badge-resolved">Resolved</span>`;
+    if (status === 'In Progress') return `<span class="badge badge-progress">In Progress</span>`;
+    return `<span class="badge">${status}</span>`;
+  }
+
+  function badgePriority(p) {
+    const cls = p === 'High' ? 'pri-high' : p === 'Medium' ? 'pri-medium' : 'pri-low';
+    return `<span class="pri ${cls}">${p}</span>`;
+  }
+
+  function renderDashboard(data) {
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+
+    // Last updated
+    const ts = data.last_updated ? new Date(data.last_updated).toLocaleString('en-AU') : 'N/A';
+    document.getElementById('last-updated').textContent = `Last updated: ${ts}`;
+
+    // KPIs
+    document.getElementById('kpi-total').textContent    = data.total_incidents ?? '—';
+    document.getElementById('kpi-open').textContent     = data.open_incidents ?? '—';
+    document.getElementById('kpi-prog').textContent     = data.in_progress_incidents ?? '—';
+    document.getElementById('kpi-resolved').textContent = data.resolved_incidents ?? '—';
+    document.getElementById('kpi-rate').textContent     = data.resolution_rate ?? '—';
+
+    // Category chart
+    const cats   = Object.keys(data.by_category || {});
+    const counts = Object.values(data.by_category || {});
+    const colors = ['#00467F','#0d5a9e','#1a6eb5','#3385d6','#66a3e0','#99c2eb','#cce0f5'];
+
+    new Chart(document.getElementById('categoryChart'), {
+      type: 'bar',
+      data: {
+        labels: cats,
+        datasets: [{
+          label: 'Incidents',
+          data: counts,
+          backgroundColor: colors,
+          borderRadius: 6,
+          borderSkipped: false,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { stepSize: 2 }, grid: { color: '#f0f2f5' } },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+
+    // Priority bars
+    const pri   = data.by_priority || {};
+    const total = data.total_incidents || 1;
+    const priEl = document.getElementById('priority-list');
+    const priConfig = [
+      { key: 'High',   cls: 'bar-high',   label: '🔴 High' },
+      { key: 'Medium', cls: 'bar-medium', label: '🟡 Medium' },
+      { key: 'Low',    cls: 'bar-low',    label: '🟢 Low' },
+    ];
+    priConfig.forEach(({ key, cls, label }) => {
+      const val = pri[key] || 0;
+      const pct = Math.round((val / total) * 100);
+      priEl.innerHTML += `
+        <div class="priority-item">
+          <div class="priority-header"><span>${label}</span><span>${val} (${pct}%)</span></div>
+          <div class="priority-bar-bg">
+            <div class="priority-bar ${cls}" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+    });
+
+    // Recent incidents table
+    const tbody = document.getElementById('incidents-table');
+    (data.recent_incidents || []).forEach(inc => {
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${inc.incident_id}</strong></td>
+          <td>${inc.reported_date}</td>
+          <td>${inc.suburb}</td>
+          <td>${inc.category}</td>
+          <td>${badgeStatus(inc.status)}</td>
+          <td>${badgePriority(inc.priority)}</td>
+        </tr>`;
+    });
+  }
+
+  loadData();
+</script>
+</body>
+</html>
